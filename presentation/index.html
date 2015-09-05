@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>CoderDojo Dublin @ The Warehouse</title>
+
+		<meta name="description" content="CoderDojo">
+		<meta name="author" content="Brian Matthews">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/blood.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+
+		<!-- http://blog.theincredibleholk.org/blog/2014/06/23/generating-morse-code-with-javascript/ -->
+
+		<script type="application/javascript">
+
+			function MorsePlayer(ac, rate) {
+    			this._oscillator = ac.createOscillator();
+    			this._gain = ac.createGain();
+    			this._gain.gain.value = 0;
+    			this._oscillator.frequency.value = 750;
+    			this._oscillator.connect(this._gain);
+    			if(rate == undefined) {
+        			rate = 20;
+    			}
+    			this._dot = 1.2 / rate; 
+    			this._oscillator.start(0);
+			}
+
+			MorsePlayer.prototype.connect = function(target) {
+    			return this._gain.connect(target);
+			}
+
+			MorsePlayer.prototype.LOOKUP_TABLE = {
+    			"A": ".-",
+    			"B": "-...",
+    			"C": "-.-.",
+    			"D": "-..",
+    			"E": ".",
+    			"F": "..-.",
+    			"G": "--.",
+    			"H": "....",
+    			"I": "..",
+    			"J": ".---",
+    			"K": "-.-",
+    			"L": ".-..",
+    			"M": "--",
+    			"N": "-.",
+    			"O": "---",
+    			"P": ".--.",
+    			"Q": "--.-",
+    			"R": ".-.",
+    			"S": "...",
+    			"T": "-",
+    			"U": "..-",
+    			"W": ".--",
+    			"V": "...-",
+    			"X": "-..-",
+    			"Y": "-.--",
+    			"Z": "--..",
+    			"1": ".----",
+    			"2": "..---",
+    			"3": "...--",
+    			"4": "....-",
+    			"5": ".....",
+    			"6": "-....",
+    			"7": "--...",
+    			"8": "---..",
+    			"9": "----.",
+    			"0": "-----"
+			};
+
+			MorsePlayer.prototype.translateCharacter = function(ch) {
+				var translated = this.LOOKUP_TABLE[ch.toUpperCase()];
+				if (translated != undefined) {
+					return translated;
+				}
+				return '';
+			}
+
+			MorsePlayer.prototype.playCode = function(time, code) {
+    			for(var i = 0; i < code.length; i++) {
+	    			this._gain.gain.setValueAtTime(1.0, time);
+        			switch(code[i]) {
+        			case '.':
+            			time += this._dot;
+            			break;
+        			case '-':
+            			time += 3 * this._dot;
+            			break;
+        			}
+        			this._gain.gain.setValueAtTime(0.0, time);
+        			time += this._dot;
+    			}
+    			return time;
+			}
+
+			MorsePlayer.prototype.playMessage = function(time, message) {
+				for (var i = 0; i < message.length; i++) {
+					if (message[i] == ' ') {
+						time += 3 * this._Dot;
+					} else {
+						var code = player.translateCharacter(message[i]);
+						time = player.playCode(time, code);
+						time += 2 * this._dot;
+					}
+				}
+			}
+
+			var ac = new (window.AudioContext || window.webkitAudioContext)();
+			var player = new MorsePlayer(ac);
+			player.connect(ac.destination);
+
+			function playMessage(message) {
+				player.playMessage(ac.currentTime, document.forms['morse'].message.value);
+				return false;
+			}
+			</script>
+
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<div class="slides">
+				<section>
+					<p><img src="images/logo.png" style="border:0;margin:0;background-color:transparent" width="200"/></p>
+					<h3>DAH-DI-DAH-DIT DAH-DI-DAH-DAH</h3>
+					<p>
+						<small>Created by <a href="http://coderdojodublin.com">CoderDojo Dublin</a> / <a href="http://twitter.com/coderdojodublin">@coderdojodublin</a></small>
+					</p>
+				</section>
+
+				<section>
+					<h2>Connect to WiFi</h2>
+					<ul>
+						<li><strong>Network:</strong> Zalando_Dublin</li>
+						<li><strong>Password:</strong> Z4land0!</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Demo</h2>
+					<p>
+						<a href="javascript:player.playMessage(ac.currentTime,'CoderDojo is cool')">Play</a>
+					</p>
+				</section>
+
+				<section>
+					<h2>Agenda</h2>
+					<table>
+						<thead>
+							<tr><th>When?</th><th>What?</th>	
+						</thead>
+						<tbody>
+						<tr><td>13:00 - 13:15</td><td>Registration &amp; set-up</td></tr>
+						<tr><td>13:15 - 14:20</td><td>Part #1 - Text to code</td></tr>
+						<tr><td>14:20 - 14:40</td><td>Break</td></tr>
+						<tr><td>14:40 - 15:45</td><td>Part #2 - Code to sound</td></tr>
+						<tr><td>15:45 - 16:00</td><td>Presentations</td></tr>
+						</tbody>
+					</table>
+				</section>
+				<section>
+					<h2>Slides</h2>
+					<p>
+						Not a coder? Not a problem. There's a fully-featured visual editor for authoring these, try it out at <a href="http://slides.com" target="_blank">http://slides.com</a>.
+					</p>
+				</section>
+
+				<section>
+					<h2>Basic Page</h2>
+					<pre><code data-trim contenteditable>
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;script type="type/javascript"&gt;
+      function playMessage() {
+        alert(document.forms['morse'].message.value);
+      }
+    &lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;form name="morse"&gt;
+	  &lt;input name="message" type="text" /&gt;
+	  &lt;a href="javascript:playMessage()"&gt;Play&lt;/a&gt;
+	&lt;/form&gt;
+  &lt;/body&gt;
+&lt;html&gt;
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>To morse code</h2>
+					<pre><code data-trim contenteditable>
+var LOOKUP_TABLE = { "O": "---", "S": "..." };
+
+function translateCharacter(ch) {
+  var translated = LOOKUP_TABLE[ch.toUpperCase()];
+  return translated != undefined ? translated : '';
+}
+
+function playMessage() {
+  var message = document.forms['morse'].message.value;
+  var morse = '';
+  for (var i = 0; i &lt; message.length; i++)
+    morse += message[i] == ' ' ? ' ' : translateCharacter(message[i]);
+  alert(morse);
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Morse Code</h2>
+					<table>
+						<tr><td>A</td><td>.-</td><td>B</td><td>-...</td><td>C</td><td>-.-.</td><td>D</td><td>-..</td><td>E</td><td>.</td><td>F</td><td>..-.</td></tr>
+    					<tr><td>G</td><td>--.</td><td>H</td><td>....</td><td>I</td><td>..</td><td>J</td><td>.---</td><td>K</td><td>-.-</td><td>L</td><td>.-..</td></tr>
+                    	<tr><td>M</td><td>--</td><td>N</td><td>-.</td><td>O</td><td>---</td><td>P</td><td>.--.</td><td>Q</td><td>--.-</td><td>R</td><td>.-.</td></tr>
+                   		<tr><td>S</td><td>...</td><td>T</td><td>-</td><td>U</td><td>..-</td><td>W</td><td>.--</td><td>V</td><td>...-</td><td>X</td><td>-..-</td></tr>
+                    	<tr><td>Y</td><td>-.--</td><td>Z</td><td>--..</td></tr>
+    					<tr><td>1</td><td>.----</td><td>2</td><td>..---</td><td>3</td><td>...--</td><td>4</td><td>....-</td><td>5</td><td>.....</td><td>6</td><td>-....</td></tr>
+    					<tr><td>7</td><td>--...</td><td>8</td><td>---..</td><td>9</td><td>----.</td><td>0</td><td>-----</td></tr>
+					</table>
+				</section>
+
+				<section>
+					<h2>Time for a break</h2>
+				</section>
+
+				<section>
+					<h2>Tones</h2>
+					<table>
+						<tr><th>Element</th><td>Time units</td></tr>
+						<tr><td>dot</td><td>1</td></tr>
+						<tr><td>dash</td><td>3<td></tr>
+						<tr><td>between dots &amp; dashes</td><td>1</td></tr>
+						<tr><td>between letters</td><td>3</td></tr>
+						<tr><td>between words</td><td>3</td></tr>
+					</table>
+				</section>
+
+				<section>
+					<h2>Be Cool</h2>
+					<p>-... .   -.-. --- --- .-..</p>
+					<img src="images/becool.png"/>
+				</section>
+
+				<section>
+					<h2>Make some noise</h2>
+					<pre><code data-trim contenteditable>
+function MorsePlayer(ac, rate) {
+  this._oscillator = ac.createOscillator();
+  this._oscillator.frequency.value = 750;
+  this._oscillator.connect(ac.destination);
+  this._oscillator.start(0);
+}
+
+var ac = new (window.AudioContext || window.webkitAudioContext)();
+var player = new MorsePlayer(ac);
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Peace &amp; Quiet</h2>
+					<pre><code data-trim contenteditable>
+function MorsePlayer(ac, rate) {
+  this._oscillator = ac.createOscillator();
+  this._gain = ac.createGain();
+  this._gain.gain.value = 0;
+  this._oscillator.frequency.value = 750;
+  this._oscillator.connect(this._gain);
+  if(rate == undefined) {
+    rate = 20;
+  }
+  this._dot = 1.2 / rate; 
+  this._oscillator.start(0);
+}
+
+MorsePlayer.prototype.connect = function(target) {
+  return this._gain.connect(target);
+}
+
+var ac = new (window.AudioContext || window.webkitAudioContext)();
+var player = new MorsePlayer(ac);
+player.connect(ac.destination);
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Play Code</h2>
+					<pre><code data-trim contenteditable>
+MorsePlayer.prototype.playCode = function(time, code) {
+  for(var i = 0; i &lt; code.length; i++) {
+    this._gain.gain.setValueAtTime(1.0, time);
+    switch(code[i]) {
+      case '.':
+        time += this._dot;
+        break;
+      case '-':
+        time += 3 * this._dot;
+        break;
+    }
+    this._gain.gain.setValueAtTime(0.0, time);
+    time += this._dot;
+  }
+  return time;
+}
+					</pre></code>
+					<pre><code data-trim contenteditable>
+<a href="javascript:player.playCode(ac.currentTime,'...')">Play S</a>
+					</pre></code>
+				</section>
+
+				<section>
+					<h2>Last step</h2>
+					<pre><code data-trim contenteditable>
+function playMessage() {
+  player.playMessage(ac.currentTime, document.forms['morse'].message.value);
+  return false;
+}
+					</pre></code>
+					<pre><code data-trim contenteditable>
+MorsePlayer.prototype.playMessage = function(time, message) {
+  for (var i = 0; i < message.length; i++) {
+    if (message[i] == ' ') {
+      time += 3 * this._dot;
+    } else {
+      var code = translateCharacter(message[i]);
+      time = player.playCode(time, code);
+      time += 2 * this._dot;
+    }
+  }
+}
+					</pre></code>
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>

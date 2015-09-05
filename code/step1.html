@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <script type="application/javascript">
+      function playMessage() {
+        alert(document.forms['morse'].message.value);
+      }
+    </script>
+  </head>
+  <body>
+    <form name="morse">
+	  <input name="message" type="text" />
+	  <a href="javascript:playMessage()">Play</a>
+	</form>
+  </body>
+<html>

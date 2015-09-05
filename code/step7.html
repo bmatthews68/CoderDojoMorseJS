@@ -1,0 +1,236 @@
+<html>
+  <head>
+    
+    <!-- This is a HTML comment -->
+
+    <!-- The Javascript code is inside a script tag and the type attribute
+         tells the browser what language the script is written in -->
+    
+    <script type="application/javascript">
+    
+      // This is a JavaScript comment finishes at the end of this line
+
+      /* This is a JavaScript comment that can be spread over many lines */
+
+      /* LOOKUP_TABLE is a global object. We are going to use it as
+         dictionary to lookup the morse code for each letter and digit.
+
+         The elements of the dictionary are defined inside the curly braces { }
+
+         Each element has a key (before the semi-colon) and a value (after the semi-colon). 
+
+         For example:
+
+         LOOKUP_TABLE["A"] returns ".-"
+
+         We pass the key we want to look for in the square brackets [] (e.g. "A") and JavaScript 
+         returns the matching value (e.g. ".-")
+
+         If there is no match JavaScript returns a special value called undefined
+
+         LOOKUP_TABLE is a global variable meaning any JavaScript code on the page can use it.
+
+         The = is called the assignment operator and it stores the dictionary object in the variable called
+         LOOKUP_TABLE.
+      */
+    
+      var LOOKUP_TABLE = {
+        "A": ".-",
+        "B": "-...",
+        "C": "-.-.",
+        "D": "-..",
+        "E": ".",
+        "F": "..-.",
+        "G": "--.", 
+        "H": "....",
+        "I": "..",
+        "J": ".---",
+        "K": "-.-",
+        "L": ".-..",
+        "M": "--",
+        "N": "-.",
+        "O": "---",
+        "P": ".--.",
+        "Q": "--.-",
+        "R": ".-.",
+        "S": "...",
+        "T": "-",
+        "U": "..-", 
+        "W": ".--",
+        "V": "...-",
+        "X": "-..-",
+        "Y": "-.--",
+        "Z": "--..",
+        "1": ".----",
+        "2": "..---",
+        "3": "...--",
+        "4": "....-",
+        "5": ".....",
+        "6": "-....",
+        "7": "--...",
+        "8": "---..",  
+        "9": "----.",
+        "0": "-----"
+      };
+
+      /* This is how we define a function. We break our program into to functions because
+         they same code might be used in more that one place or to make it more readable.
+
+         function is a keyword that tells JavaScript we are define a function. Functions
+         have a name (e.g. translateCharacter), can have arguments or parameters (e.g. ch)
+         and usually return a result.
+      */
+
+      function translateCharacter(ch) {
+        /* Convert ch to uppercase before looking for a match in the LOOK_UP table
+           The result is stored in a local variable called translated. Local variables only
+           exist inside the curly braces in which they were created. If we left off the
+           var keyword then the variable would have been global.
+        */
+        var translated = LOOKUP_TABLE[ch.toUpperCase()];
+
+        /* If there was no match then translated would have the value undefined in that
+           case we want to return an empty string instead.
+
+           != means is an boolean operator that means "not equal to" it is called a boolean
+          operator because it will only every result in either true or false. It is also a
+          binary operator because it has two operands. i.e in the case of x != y, x and y are
+          the operands.
+
+          ?: is called the Elvis operator. It is a ternary operator which means it has 3 operands.
+          If you have an expression x ? y : z then x is a boolean expression operand, if x is true
+          then the result will be y, otherwise it will be z.
+        */
+        return translated != undefined ? translated : '';
+      }
+
+      /* This the function that gets called when you press the Play button */
+
+      function playMessage() {
+        /* We are going to forward the call to the playMessage function of the player object. That
+           function needs to know the current time and also what you typed into the input box.
+
+           player and ac are two global variables we define further down in the script. 
+
+           document is a special object that allows you to access the contents of the web page. It
+           has dictionary called forms that we are using to find the form containing the input box.
+           Once we locate the form called "morse" then we need to get the value of the "message"
+           input box.
+        */ 
+        player.playMessage(ac.currentTime, document.forms['morse'].message.value);
+        return false;
+      }
+
+      /* This style of function is a constructor. We are going to create an object and store some
+         data in that object. That object is refered to as "this" inside the constructor.
+
+         The constructor is taking two parameters. One is the AudioContext object which allows us
+         to make sounds in the browser. The other a parameter is speed that the morse code. The rate
+         is optional and we don't in fact use it.
+      */
+      function MorsePlayer(ac, rate) {
+        /* Create a oscillator that we can use to generate a tone. */
+        this._oscillator = ac.createOscillator();
+        /* Use the gain to control the volume of the tone. */
+        this._gain = ac.createGain();
+        /* Set the volume to 0 so that we don't go deaf or mad! */
+        this._gain.gain.value = 0;
+        /* This is the frequency of the tone used for the dots and dashes. You can experiment with
+           different values.
+        */
+        this._oscillator.frequency.value = 750;
+        /* Connect the volume control to the oscillator */
+        this._oscillator.connect(this._gain);
+        /* If the rate was not specified then we will use a default value */
+        if(rate == undefined) {
+          rate = 20;
+        }
+        /* Calculate the length of a dot */
+        this._dot = 1.2 / rate; 
+        /* Tell the oscillator to start generating the tone. */
+        this._oscillator.start(0);
+      }
+
+      /* This is a special type of function declaration called a prototype. Instead
+         of creating a global variable are attaching that function to the MorsePlayer
+         object. We are saying that the template used to generate MorsePlayer objects 
+         (the prototype) will have an attribute called connect. But connect will actually
+         be function rather than a value. 
+
+         Notice also that function doesn't need to have a name here.
+      */
+      MorsePlayer.prototype.connect = function(target) {
+        /* We are just connecting the volume control to the audio context in this function */
+        return this._gain.connect(target);
+      }
+
+      /* This function used to control the oscillator to generate
+         the tone for the dots and/or dashes that are represent a single letter or digit.
+
+         The time argument/parameter is used to calculate when the tone should start and
+         stop. The code argument contains the dots and dashes for the letter or digit.
+     */
+      MorsePlayer.prototype.playCode = function(time, code) {
+        /* This a loop that tells us to start counting from 0 (var i = 0) in incements of 1 (i++)
+           until we go past the end of the string containing the dots and dashes (i < code.length)
+        */
+        for(var i = 0; i < code.length; i++) {
+          /* Turn up the gain so we can hear the tone */
+          this._gain.gain.setValueAtTime(1.0, time);
+          switch(code[i]) {
+            case '.':
+              /* For dots we only need to wait 1 time unit before turning down the gain. */
+              time += this._dot;
+              break;
+            case '-':
+              /* For dashes we need to wait 3 time units before turning down the gain. */
+              time += 3 * this._dot;
+              break;
+          }
+          /* Turn down the gain */
+          this._gain.gain.setValueAtTime(0.0, time);
+          /* Put in a 1 time unit pause between the letters */
+          time += this._dot;
+        }
+        return time;
+      }
+
+      /* Play a whole message from the specified starting time. */
+      MorsePlayer.prototype.playMessage = function(time, message) {
+        for (var i = 0; i < message.length; i++) {
+          if (message[i] == ' ') {
+            /* If the letter is a space put in a 3 time unit pause. */
+            time += 3 * this._dot;
+          } else {
+            /* Otherwise use the translate function to lookup the morse code for the letter or digit */
+            var code = translateCharacter(message[i]);
+            /* Now play the tones for the dots and dashes */
+            time = player.playCode(time, code);
+            /* wait an additional 2 time units between each letter */
+            time += 2 * this._dot;
+          }
+        }
+      }
+
+      /* Get the Audio Context from the browser. This strange looking code is handle different browsers (Chrome, 
+        Firefox, or Safari) */
+      var ac = new (window.AudioContext || window.webkitAudioContext)();
+      /* Create our player using the constructor function and passing it the Audio Context */
+      var player = new MorsePlayer(ac);
+      /* Make sure the gain control is wired up to the Audio Context */
+      player.connect(ac.destination);
+    </script>
+  </head>
+  <!-- The body of the HTML page contains things you can see -->
+  <body>
+    <!-- A form contains input controls. This is called "morse" -->
+    <form name="morse">
+      <!-- This input control is a text box called "message" -->
+      <input name="message" type="text" />
+      <!-- This is a hyperlink but instead of going to another web page we
+           are getting it to call a JavaScript function" -->
+      <a href="javascript:playMessage()">Play</a>
+    </form>
+    <a href="javascript:player.playCode(ac.currentTime,'...')">Play S</a>
+  </body>
+<html>

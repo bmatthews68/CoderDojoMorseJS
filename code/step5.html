@@ -1,0 +1,102 @@
+<html>
+  <head>
+    <script type="application/javascript">
+      var LOOKUP_TABLE = {
+        "A": ".-",
+        "B": "-...",
+        "C": "-.-.",
+        "D": "-..",
+        "E": ".",
+        "F": "..-.",
+        "G": "--.", 
+        "H": "....",
+        "I": "..",
+        "J": ".---",
+        "K": "-.-",
+        "L": ".-..",
+        "M": "--",
+        "N": "-.",
+        "O": "---",
+        "P": ".--.",
+        "Q": "--.-",
+        "R": ".-.",
+        "S": "...",
+        "T": "-",
+        "U": "..-", 
+        "W": ".--",
+        "V": "...-",
+        "X": "-..-",
+        "Y": "-.--",
+        "Z": "--..",
+        "1": ".----",
+        "2": "..---",
+        "3": "...--",
+        "4": "....-",
+        "5": ".....",
+        "6": "-....",
+        "7": "--...",
+        "8": "---..",  
+        "9": "----.",
+        "0": "-----"
+      };
+
+      function translateCharacter(ch) {
+        var translated = LOOKUP_TABLE[ch.toUpperCase()];
+        return translated != undefined ? translated : '';
+      }
+
+      function playMessage() {
+        var message = document.forms['morse'].message.value;
+        var morse = '';
+        for (var i = 0; i < message.length; i++)
+          morse += message[i] == ' ' ? ' ' : translateCharacter(message[i]);
+        alert(morse);
+      }
+
+      function MorsePlayer(ac, rate) {
+        this._oscillator = ac.createOscillator();
+        this._gain = ac.createGain();
+        this._gain.gain.value = 0;
+        this._oscillator.frequency.value = 750;
+        this._oscillator.connect(this._gain);
+        if(rate == undefined) {
+          rate = 20;
+        }
+        this._dot = 1.2 / rate; 
+        this._oscillator.start(0);
+      }
+
+      MorsePlayer.prototype.connect = function(target) {
+        return this._gain.connect(target);
+      }
+
+      MorsePlayer.prototype.playCode = function(time, code) {
+        for(var i = 0; i < code.length; i++) {
+          this._gain.gain.setValueAtTime(1.0, time);
+          switch(code[i]) {
+            case '.':
+              time += this._dot;
+              break;
+            case '-':
+              time += 3 * this._dot;
+              break;
+          }
+          this._gain.gain.setValueAtTime(0.0, time);
+          time += this._dot;
+        }
+        return time;
+      }
+
+      var ac = new (window.AudioContext || window.webkitAudioContext)();
+      var player = new MorsePlayer(ac);
+      player.connect(ac.destination);
+    </script>
+  </head>
+  <body>
+    <form name="morse">
+      <input name="message" type="text" />
+      <a href="javascript:playMessage()">Play</a>
+    </form>
+    <a href="javascript:player.playCode(ac.currentTime,'...')">Play S</a>
+  </body>
+<html>

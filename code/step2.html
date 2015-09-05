@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <script type="application/javascript">
+      var LOOKUP_TABLE = { "O": "---", "S": "..." };
+
+      function translateCharacter(ch) {
+        var translated = LOOKUP_TABLE[ch.toUpperCase()];
+        return translated != undefined ? translated : '';
+      }
+
+      function playMessage() {
+        var message = document.forms['morse'].message.value;
+        var morse = '';
+        for (var i = 0; i < message.length; i++)
+          morse += message[i] == ' ' ? ' ' : translateCharacter(message[i]);
+        alert(morse);
+      }
+    </script>
+  </head>
+  <body>
+    <form name="morse">
+	  <input name="message" type="text" />
+	  <a href="javascript:playMessage()">Play</a>
+	</form>
+  </body>
+<html>

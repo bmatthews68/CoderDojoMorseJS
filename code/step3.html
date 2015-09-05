@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <script type="application/javascript">
+      var LOOKUP_TABLE = {
+        "A": ".-",
+        "B": "-...",
+        "C": "-.-.",
+        "D": "-..",
+        "E": ".",
+        "F": "..-.",
+        "G": "--.", 
+        "H": "....",
+        "I": "..",
+        "J": ".---",
+        "K": "-.-",
+        "L": ".-..",
+        "M": "--",
+        "N": "-.",
+        "O": "---",
+        "P": ".--.",
+        "Q": "--.-",
+        "R": ".-.",
+        "S": "...",
+        "T": "-",
+        "U": "..-", 
+        "W": ".--",
+        "V": "...-",
+        "X": "-..-",
+        "Y": "-.--",
+        "Z": "--..",
+        "1": ".----",
+        "2": "..---",
+        "3": "...--",
+        "4": "....-",
+        "5": ".....",
+        "6": "-....",
+        "7": "--...",
+        "8": "---..",  
+        "9": "----.",
+        "0": "-----"
+      };
+
+      function translateCharacter(ch) {
+        var translated = LOOKUP_TABLE[ch.toUpperCase()];
+        return translated != undefined ? translated : '';
+      }
+
+      function playMessage() {
+        var message = document.forms['morse'].message.value;
+        var morse = '';
+        for (var i = 0; i < message.length; i++)
+          morse += message[i] == ' ' ? ' ' : translateCharacter(message[i]);
+        alert(morse);
+      }
+
+      function MorsePlayer(ac, rate) {
+        this._oscillator = ac.createOscillator();
+        this._oscillator.frequency.value = 750;
+        this._oscillator.connect(ac.destination);
+        this._oscillator.start(0);
+      }
+
+      var ac = new (window.AudioContext || window.webkitAudioContext)();
+      var player = new MorsePlayer(ac);
+    </script>
+  </head>
+  <body>
+    <form name="morse">
+	  <input name="message" type="text" />
+	  <a href="javascript:playMessage()">Play</a>
+	</form>
+  </body>
+<html>
